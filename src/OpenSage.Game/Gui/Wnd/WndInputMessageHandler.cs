@@ -143,10 +143,25 @@ namespace OpenSage.Gui.Wnd
                         break;
                     }
 
+                case InputMessageType.MouseWheel:
+                    {
+                        if (GetControlAtPoint(message.Value.MousePosition, out var element, out var mousePosition))
+                        {
+                            var windowMessageType = message.Value.ScrollWheel > 0
+                                        ? WndWindowMessageType.MouseWheelUp
+                                        : WndWindowMessageType.MouseWheelDown;
+                            element.InputCallback.Invoke(
+                                element,
+                                new WndWindowMessage(windowMessageType, element, mousePosition),
+                                context);
+                            return InputMessageResult.Handled;
+                        }
+                        break;
+                    }
+
                 // For the time being, just consume middle click and wheel events so that they don't go through controls:
                 case InputMessageType.MouseMiddleButtonDown:
                 case InputMessageType.MouseMiddleButtonUp:
-                case InputMessageType.MouseWheel:
                     {
                         return GetControlAtPoint(message.Value.MousePosition, out var _, out var _)
                             ? InputMessageResult.Handled

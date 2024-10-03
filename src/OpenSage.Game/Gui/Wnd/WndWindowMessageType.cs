@@ -13,6 +13,9 @@
         MouseRightDown,
         MouseRightUp,
 
+        MouseWheelUp,
+        MouseWheelDown,
+
         SelectedButton,
 
         KeyDown,

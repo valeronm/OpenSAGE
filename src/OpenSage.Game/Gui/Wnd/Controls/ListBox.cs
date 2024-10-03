@@ -192,17 +192,30 @@ namespace OpenSage.Gui.Wnd.Controls
 
         private void OnUpButtonClick(object sender, EventArgs e)
         {
-            _itemsArea.CurrentStartIndex = Math.Max(_itemsArea.CurrentStartIndex - 1, 0);
+            _itemsArea.ScrollUp();
         }
 
         private void OnDownButtonClick(object sender, EventArgs e)
         {
-            _itemsArea.CurrentStartIndex = Math.Min(_itemsArea.CurrentStartIndex + 1, Items.Length - MaxDisplay);
+            _itemsArea.ScrollDown();
         }
 
         private void OnThumbClick(object sender, EventArgs e)
         {
             throw new NotImplementedException();
+        }
+
+        protected override void DefaultInputOverride(WndWindowMessage message, ControlCallbackContext context)
+        {
+            switch (message.MessageType)
+            {
+                case WndWindowMessageType.MouseWheelUp:
+                    _itemsArea.ScrollUp();
+                    break;
+                case WndWindowMessageType.MouseWheelDown:
+                    _itemsArea.ScrollDown();
+                    break;
+            }
         }
 
         protected override void LayoutOverride()
@@ -382,6 +395,21 @@ namespace OpenSage.Gui.Wnd.Controls
 
         public Image SelectedItemHoverBackgroundImage { get; set; }
 
+        public void ScrollUp(int positions = 1)
+        {
+            CurrentStartIndex = Math.Max(CurrentStartIndex - positions, 0);
+        }
+
+        public void ScrollDown(int positions = 1)
+        {
+            var lastChild = Controls.LastOrDefault();
+            if (lastChild == null || lastChild.Visible)
+            {
+                return;
+            }
+            CurrentStartIndex = Math.Min(CurrentStartIndex + positions, Items.Length - MaxDisplay);
+        }
+
         public override Size GetPreferredSize(Size proposedSize)
         {
             var height = 0;
@@ -513,6 +541,12 @@ namespace OpenSage.Gui.Wnd.Controls
                     break;
                 case WndWindowMessageType.MouseEnter:
                     _parent.HoveredIndex = _parent.Controls.IndexOf(this);
+                    break;
+                case WndWindowMessageType.MouseWheelUp:
+                    _parent.ScrollUp();
+                    break;
+                case WndWindowMessageType.MouseWheelDown:
+                    _parent.ScrollDown();
                     break;
             }
         }
